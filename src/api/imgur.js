@@ -1,4 +1,5 @@
 import qs from 'qs';
+import axios from 'axios';
 import configData from '../../src/config.json';
 const CLIENT_ID = configData.CLIENT_ID;
 const ROOT_URL = 'https://api.imgur.com';
@@ -14,8 +15,24 @@ export default {
       querystring
     )}`;
   },
+  fetchImages(token) {
+    return axios.get(`${ROOT_URL}/3/account/me/images`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+  uploadImages(images, token) {
+    const promises = Array.from(images).map((image) => {
+      const formData = new FormData();
+      formData.append('image', image);
+
+      return axios.post(`${ROOT_URL}/3/image`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    });
+    return Promise.all(promises);
+  },
 };
-
-// https://api.imgur.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&response_type=REQUESTED_RESPONSE_TYPE&state=APPLICATION_STATE
-
-// http://localhost:8080/oauth2/callback#access_token=60619cc7b1d6993c06a2a4ad0dfb8f4535b0fa29&expires_in=315360000&token_type=bearer&refresh_token=7987a076fddc399cde709fcb92f17e32bdf0761d&account_username=moroseCoding&account_id=159284637
